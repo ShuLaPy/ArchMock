@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { TextStreamChatTransport } from "ai";
-import { useRef, useState, useCallback, useMemo } from "react";
+import { useRef, useState, useCallback, useMemo, useEffect } from "react";
 import { Problem } from "@/types/problem";
 import { useProblemSession } from "@/hooks/useProblemSession";
 import { ArrowUp, Loader2 } from "lucide-react";
@@ -12,7 +12,7 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ problem }: ChatInterfaceProps) {
-  const { markdown, getSvgSnapshot } = useProblemSession();
+  const { markdown, getSvgSnapshot, setChatMessages } = useProblemSession();
   const [inputValue, setInputValue] = useState("");
   const markdownRef = useRef(markdown);
   markdownRef.current = markdown;
@@ -37,6 +37,10 @@ export function ChatInterface({ problem }: ChatInterfaceProps) {
 
   const { sendMessage, messages, status } = useChat({ transport });
   const isLoading = status === "submitted" || status === "streaming";
+
+  useEffect(() => {
+    setChatMessages(messages);
+  }, [messages, setChatMessages]);
 
   const onSubmit = useCallback(
     async (e: React.FormEvent) => {

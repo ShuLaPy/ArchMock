@@ -103,3 +103,13 @@ export const chatModel = createModel(
 export const feedbackModel = createModel(
   process.env.FEEDBACK_MODEL ?? "openrouter/google/gemini-2.0-flash"
 );
+
+/** Strong model for section-by-section evaluation. */
+export const evaluationModel = createModel(
+  process.env.EVALUATION_MODEL ?? "google/gemini-2.5-pro"
+);
+
+/** Vision-capable model for diagram analysis. */
+export const visionModel = createModel(
+  process.env.VISION_MODEL ?? "google/gemini-2.5-pro"
+);

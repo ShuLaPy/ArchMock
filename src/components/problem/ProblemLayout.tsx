@@ -6,6 +6,7 @@ import { Problem } from "@/types/problem";
 import { ProblemSessionContext } from "@/hooks/useProblemSession";
 import { useExcalidrawRef } from "@/hooks/useExcalidrawRef";
 import { getMarkdownTemplate } from "@/lib/markdown-template";
+import type { UIMessage } from "ai";
 import { LeftPanel } from "./LeftPanel";
 import { MiddlePanel } from "./MiddlePanel";
 import { RightPanel } from "./RightPanel";
@@ -21,11 +22,12 @@ interface ProblemLayoutProps {
 
 export function ProblemLayout({ problem }: ProblemLayoutProps) {
   const [markdown, setMarkdown] = useState(() => getMarkdownTemplate(problem));
+  const [chatMessages, setChatMessages] = useState<UIMessage[]>([]);
   const { excalidrawRef, getSvgSnapshot } = useExcalidrawRef();
 
   return (
     <ProblemSessionContext.Provider
-      value={{ markdown, setMarkdown, excalidrawRef, getSvgSnapshot }}
+      value={{ markdown, setMarkdown, excalidrawRef, getSvgSnapshot, chatMessages, setChatMessages }}
     >
       <div className="flex flex-col h-screen bg-background">
         <header className="h-12 shrink-0 flex items-center justify-between px-4 border-b border-border">

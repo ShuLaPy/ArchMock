@@ -1,6 +1,10 @@
 "use client";
 
-import { StructuredFeedback, StoredFeedback } from "@/types/feedback";
+import {
+  StructuredFeedback,
+  FeedbackSection,
+  StoredFeedback,
+} from "@/types/feedback";
 import { FeedbackSectionCard } from "./FeedbackSection";
 import { Loader2, AlertCircle, X, Clock, Trash2 } from "lucide-react";
 
@@ -13,6 +17,8 @@ interface FeedbackModalProps {
   history: StoredFeedback[];
   onSelectHistory: (entry: StoredFeedback) => void;
   onDeleteHistory: (id: string) => void;
+  streamingSections?: FeedbackSection[];
+  progress?: number;
 }
 
 function OverallScore({ score }: { score: number }) {
@@ -40,6 +46,71 @@ function OverallScore({ score }: { score: number }) {
           {score}
         </span>
         <span className="text-lg text-muted-foreground/50">/10</span>
+      </div>
+    </div>
+  );
+}
+
+function ProgressBar({ progress }: { progress: number }) {
+  const pct = Math.round(progress * 100);
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span>Evaluating your design...</span>
+        <span className="tabular-nums">{pct}%</span>
+      </div>
+      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+        <div
+          className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function SectionSkeleton() {
+  return (
+    <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="h-4 w-32 bg-muted rounded" />
+        <div className="h-4 w-10 bg-muted rounded" />
+      </div>
+      <div className="h-1 bg-muted rounded-full" />
+      <div className="space-y-2">
+        <div className="h-3 w-full bg-muted rounded" />
+        <div className="h-3 w-3/4 bg-muted rounded" />
+      </div>
+    </div>
+  );
+}
+
+function StreamingContent({
+  sections,
+  progress,
+}: {
+  sections: FeedbackSection[];
+  progress: number;
+}) {
+  const remaining = 8 - sections.length;
+  return (
+    <div className="space-y-8">
+      <ProgressBar progress={progress} />
+
+      <div className="space-y-4">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          Section Breakdown
+        </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {sections.map((section) => (
+            <FeedbackSectionCard key={section.name} section={section} />
+          ))}
+          {Array.from({ length: remaining > 0 ? remaining : 0 }).map(
+            (_, i) => (
+              <SectionSkeleton key={`skeleton-${i}`} />
+            )
+          )}
+        </div>
       </div>
     </div>
   );
@@ -144,8 +215,13 @@ export function FeedbackModal({
   history,
   onSelectHistory,
   onDeleteHistory,
+  streamingSections = [],
+  progress = 0,
 }: FeedbackModalProps) {
   if (!open) return null;
+
+  const showStreaming = isLoading && streamingSections.length > 0;
+  const showSpinner = isLoading && streamingSections.length === 0 && !error;
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
@@ -213,16 +289,23 @@ export function FeedbackModal({
         {/* Main content */}
         <main className="flex-1 min-w-0 overflow-y-auto">
           <div className="max-w-3xl mx-auto px-6 py-8">
-            {isLoading && (
+            {showSpinner && (
               <div className="flex flex-col items-center justify-center py-32 gap-3">
                 <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
                 <p className="text-muted-foreground text-sm">
-                  Analyzing your design...
+                  Starting evaluation pipeline...
                 </p>
                 <p className="text-muted-foreground/50 text-xs">
-                  This may take up to 30 seconds
+                  8 sections evaluated in parallel
                 </p>
               </div>
+            )}
+
+            {showStreaming && (
+              <StreamingContent
+                sections={streamingSections}
+                progress={progress}
+              />
             )}
 
             {!isLoading && error && (
