@@ -10,6 +10,7 @@ import { LeftPanel } from "./LeftPanel";
 import { MiddlePanel } from "./MiddlePanel";
 import { RightPanel } from "./RightPanel";
 import { SubmitButton } from "./SubmitButton";
+import { SessionTimer } from "./SessionTimer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -40,6 +41,7 @@ export function ProblemLayout({ problem }: ProblemLayoutProps) {
               {problem.title}
             </span>
           </div>
+          <SessionTimer />
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <SubmitButton problemSlug={problem.slug} />
