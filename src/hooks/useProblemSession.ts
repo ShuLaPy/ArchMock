@@ -1,12 +1,12 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, type SetStateAction, type Dispatch } from "react";
 import type { RefObject } from "react";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 export interface ProblemSessionContext {
   markdown: string;
-  setMarkdown: (value: string) => void;
+  setMarkdown: Dispatch<SetStateAction<string>>;
   excalidrawRef: RefObject<ExcalidrawImperativeAPI | null>;
   getSvgSnapshot: () => Promise<string>;
 }

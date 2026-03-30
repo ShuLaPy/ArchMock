@@ -3,6 +3,7 @@
 import "@mdxeditor/editor/style.css";
 import {
   MDXEditor,
+  type MDXEditorMethods,
   headingsPlugin,
   listsPlugin,
   quotePlugin,
@@ -14,16 +15,28 @@ import {
   linkPlugin,
   linkDialogPlugin,
 } from "@mdxeditor/editor";
+import { useRef, useEffect } from "react";
+import type { MutableRefObject } from "react";
 
 interface MarkdownEditorProps {
   value: string;
   onChange: (value: string) => void;
+  editorRef?: MutableRefObject<MDXEditorMethods | null>;
 }
 
 export default function MarkdownEditor({
   value,
   onChange,
+  editorRef,
 }: MarkdownEditorProps) {
+  const internalRef = useRef<MDXEditorMethods>(null);
+
+  useEffect(() => {
+    if (editorRef) {
+      editorRef.current = internalRef.current;
+    }
+  });
+
   return (
     <div className="mdx-scroll-host">
       <style>{`
@@ -93,6 +106,7 @@ export default function MarkdownEditor({
         .dark .mdx-scroll-host em { color: #a3a3a3; }
       `}</style>
       <MDXEditor
+        ref={internalRef}
         markdown={value}
         onChange={onChange}
         plugins={[
