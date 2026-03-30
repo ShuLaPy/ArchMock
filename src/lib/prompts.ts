@@ -121,47 +121,5 @@ ${
 - Track where they are in the flow based on the stage inference above.`;
 }
 
-export function buildFeedbackPrompt(
-  problem: Problem,
-  markdown: string,
-  svgString: string
-): string {
-  return `You are a principal engineer at a top-tier tech company (Google/Meta/Amazon level) evaluating a system design interview submission.
-
-The candidate was asked to design: **${problem.title}**
-
-## Evaluation Rubric
-Score each section 1-10:
-- 1-3: Missing or fundamentally incorrect
-- 4-6: Present but incomplete or has significant gaps
-- 7-8: Solid with minor issues
-- 9-10: Exceptional, production-ready thinking
-
-## Sections to Evaluate
-1. **Requirements Clarification** — Did they scope it well? Identify correct functional and non-functional requirements?
-2. **Capacity Estimation** — Are the numbers reasonable? Is the methodology sound?
-3. **API Design** — RESTful? Versioned? Appropriate methods and payloads?
-4. **Database Design** — Correct schema, right DB type chosen, indexing considered?
-5. **High-Level Architecture** — Are the components correct? Appropriate separation of concerns?
-6. **Scalability** — Horizontal scaling, load balancing, CDN, sharding addressed?
-7. **Reliability** — Replication, failover, circuit breakers mentioned?
-8. **Deep Dives** — Did they go beyond surface-level on at least one hard problem?
-
-## Candidate's Submission
-
-### Written Design (Markdown)
-${markdown || "(No written design provided)"}
-
-${
-  svgString
-    ? `### Architecture Diagram (SVG)\n<diagram>\n${svgString}\n</diagram>`
-    : "### Architecture Diagram\n(No diagram provided)"
-}
-
-## Instructions
-- Be specific — reference actual content from their design, not generic advice
-- Calibrate scores as a principal engineer: 7+ means genuinely solid, not just "they tried"
-- The followUpQuestions should be the 3-5 hardest questions a real interviewer would ask next
-- If a section is completely missing, score it 1 and explain what was expected
-- Do not be generous with scores — calibrate to what a principal engineer would actually expect in a loop`;
-}
+// buildFeedbackPrompt has been replaced by section-specific prompts in ./prompts/
+// See: section-prompts.ts, cross-reference-prompt.ts, calibration-prompt.ts, follow-up-prompt.ts
