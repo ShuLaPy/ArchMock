@@ -2,9 +2,10 @@
 
 import { useState, useCallback } from "react";
 import { useProblemSession } from "@/hooks/useProblemSession";
+import { useFeedbackHistory } from "@/hooks/useFeedbackHistory";
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
-import { StructuredFeedback } from "@/types/feedback";
-import { Sparkles } from "lucide-react";
+import { StructuredFeedback, StoredFeedback } from "@/types/feedback";
+import { Sparkles, History } from "lucide-react";
 
 interface SubmitButtonProps {
   problemSlug: string;
@@ -12,6 +13,7 @@ interface SubmitButtonProps {
 
 export function SubmitButton({ problemSlug }: SubmitButtonProps) {
   const { markdown, getSvgSnapshot } = useProblemSession();
+  const { history, save, remove } = useFeedbackHistory(problemSlug);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedback, setFeedback] = useState<StructuredFeedback | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +55,7 @@ export function SubmitButton({ problemSlug }: SubmitButtonProps) {
       }
 
       const data: StructuredFeedback = await res.json();
+      save(data);
       setFeedback(data);
     } catch (err) {
       console.error(err);
@@ -64,10 +67,38 @@ export function SubmitButton({ problemSlug }: SubmitButtonProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [getSvgSnapshot, markdown, problemSlug, saveSvgFile]);
+  }, [getSvgSnapshot, markdown, problemSlug, saveSvgFile, save]);
+
+  const handleOpenHistory = useCallback(() => {
+    setError(null);
+    setIsLoading(false);
+    if (history.length > 0) {
+      setFeedback(history[0].feedback);
+    } else {
+      setFeedback(null);
+    }
+    setFeedbackOpen(true);
+  }, [history]);
+
+  const handleSelectHistory = useCallback((entry: StoredFeedback) => {
+    setError(null);
+    setIsLoading(false);
+    setFeedback(entry.feedback);
+  }, []);
 
   return (
     <>
+      {history.length > 0 && (
+        <button
+          onClick={handleOpenHistory}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          title="View past feedback"
+        >
+          <History className="w-4 h-4" />
+          History
+        </button>
+      )}
+
       <button
         onClick={handleSubmit}
         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
@@ -82,6 +113,9 @@ export function SubmitButton({ problemSlug }: SubmitButtonProps) {
         feedback={feedback}
         isLoading={isLoading}
         error={error}
+        history={history}
+        onSelectHistory={handleSelectHistory}
+        onDeleteHistory={remove}
       />
     </>
   );

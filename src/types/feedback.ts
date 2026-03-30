@@ -13,3 +13,9 @@ export interface StructuredFeedback {
   improvements: string[];
   followUpQuestions: string[];
 }
+
+export interface StoredFeedback {
+  id: string;
+  feedback: StructuredFeedback;
+  timestamp: number;
+}
